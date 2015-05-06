@@ -1,0 +1,29 @@
+Creating Custom Directives
+创建自定义指令
+
+What are Directives?
+什么是指令
+At a high level, directives are markers on a DOM element (such as an attribute, element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM element or even transform the DOM element and its children.
+在一个比较高的层次上来说，指令是DOM元素（比如作为属性、元素名、注释或类名）上的标记，用来告诉angular的HTML编译器在这个DOM元素上添加一些指定行为，甚至改造这个DOM元素以及它的子元素。
+Angular comes with a set of these directives built-in, like ngBind, ngModel, and ngClass. 
+angular有一些内置的指令，比如ngBind、ngClass、ngModel。
+Much like you create controllers and services, you can create your own directives for Angular to use. 
+就像你在创建控制器和服务时一样，你能创建你自己的指令让angular去使用。
+When Angular bootstraps your application, the HTML compiler traverses the DOM matching directives against the DOM elements.
+当angular引导你的应用时，HTML编译器就会在DOM元素和指令之间建立映射。
+What does it mean to "compile" an HTML template? 
+什么是HTML模板的编译？
+For AngularJS, "compilation" means attaching event listeners to the HTML to make it interactive. 
+对于angularjs来说，编译意味着在HTML上添加事件监听，使它能够进行互动。
+The reason we use the term "compile" is that the recursive process of attaching directives mirrors the process of compiling source code in compiled programming languages.
+我们使用“编译”这个词的原因在于，添加指令的这个递归过程借鉴于编译型程序语言编译源代码的过程。
+
+Directive types
+指令有哪些类型
+$compile can match directives based on element names, attributes, class names, as well as comments.
+指令可以基于元素名、属性、类型，以及注释
+Best Practice: Prefer using directives via tag name and attributes over comment and class names.
+最佳实践：最好使用元素名或属性，而不是注释和类名来定义指令。
+Doing so generally makes it easier to determine what directives a given element matches.
+这样做的话，通常来说会使得确定哪个指令和给定元素相匹配的过程更容易。
+

@@ -178,3 +178,344 @@ Using an element for the myCustomer directive is clearly the right choice becaus
 you're defining the core behavior of the element as a customer component.
 我们是在给客户信息组件定义核心行为。
 
+Isolating the Scope of a Directive
+隔离指令的作用域
+Our myCustomer directive above is great, but it has a fatal flaw. 
+我们的myCistomer指令还不错，但它其实有一个致命的缺陷。
+We can only use it once within a given scope.
+对于一个给定的作用域，我们只能使用它一次。
+
+In its current implementation, we'd need to create a different controller each time in order to re-use such a directive:
+对于当前的实现来说，我们必须每次都创建一个不同的控制器来重用这个指令：
+angular.module('docsScopeProblemExample', [])
+.controller('NaomiController', ['$scope', function($scope) {
+  $scope.customer = {
+    name: 'Naomi',
+    address: '1600 Amphitheatre'
+  };
+}])
+.controller('IgorController', ['$scope', function($scope) {
+  $scope.customer = {
+    name: 'Igor',
+    address: '123 Somewhere'
+  };
+}])
+.directive('myCustomer', function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'my-customer.html'
+  };
+});
+---------
+Name: {{customer.name}} Address: {{customer.address}}
+---------
+<div ng-controller="NaomiController">
+  <my-customer></my-customer>
+</div>
+<hr>
+<div ng-controller="IgorController">
+  <my-customer></my-customer>
+</div>
+
+This is clearly not a great solution.
+这显然不是一个好的解决方案。
+
+What we want to be able to do is separate the scope inside a directive from the scope outside, and then map the outer scope to a directive's inner scope.
+我们要做的，是需要分离指令内部的作用域和指令外部的作用域，然后把外部作用域和指令内部的作用域联系起来。
+We can do this by creating what we call an isolate scope.
+我们用隔离作用域来实现这件事。
+To do this, we can use a directive's scope option:
+我们需要使用指令的作用域选项：
+angular.module('docsIsolateScopeDirective', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.naomi = { name: 'Naomi', address: '1600 Amphitheatre' };
+  $scope.igor = { name: 'Igor', address: '123 Somewhere' };
+}])
+.directive('myCustomer', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      customerInfo: '=info'
+    },
+    templateUrl: 'my-customer-iso.html'
+  };
+});
+---------
+Name: {{customerInfo.name}} Address: {{customerInfo.address}}
+---------
+<div ng-controller="Controller">
+  <my-customer info="naomi"></my-customer>
+  <hr>
+  <my-customer info="igor"></my-customer>
+</div>
+
+Looking at index.html, the first <my-customer> element binds the info attribute to naomi, which we have exposed on our controller's scope. 
+看一下index.html，第一个<my-customer>元素的info属性和naomi绑定，naomi在我们的控制器的作用域内暴露出来。
+The second binds info to igor.
+另一个绑定给了igor。
+Let's take a closer look at the scope option:
+让我们仔细看一下作用域选项：
+//...
+scope: {
+  customerInfo: '=info'
+},
+//...
+The scope option is an object that contains a property for each isolate scope binding. 
+作用域选项是一个对象，包含了给每一个隔离作用域绑定所定义的属性。
+In this case it has just one property:
+在这个例子里，它只有一个属性：
+   Its name (customerInfo) corresponds to the directive's isolate scope property customerInfo.
+   它的名字(customerInfo)对应着指令的隔离作用域的属性customerInfo。
+   Its value (=info) tells $compile to bind to the info attribute.
+   它的值(=info)告诉编译器，去绑定叫info的attribute。
+Note: These =attr attributes in the scope option of directives are normalized just like directive names.
+注意：指令的作用域选项里的=attr属性被设置为很像指令的名字。
+To bind to the attribute in <div bind-to-this="thing">, you'd specify a binding of =bindToThis.
+为了绑定<div bind-to-this="thing">，你需要将其命名为=bindToThis。
+For cases where the attribute name is the same as the value you want to bind to inside the directive's scope, you can use this shorthand syntax:
+如果，要绑定的隔离作用域里的值和属性名完全一样的话，你可以用这样的简写语法：
+...
+scope: {
+  // same as '=customer'
+  customer: '='
+},
+...
+Besides making it possible to bind different data to the scope inside a directive, using an isolated scope has another effect.
+除了绑定不同的数据到指令内部的隔离作用域上使用隔离作用域还有别的作用。
+
+We can show this by adding another property, vojta, to our scope and trying to access it from within our directive's template:
+我们可以增加另外一个属性，vojta，到我们的作用域里，然后在我们的指令的模板里访问它来展示这个作用：
+angular.module('docsIsolationExample', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.naomi = { name: 'Naomi', address: '1600 Amphitheatre' };
+  $scope.vojta = { name: 'Vojta', address: '3456 Somewhere Else' };
+}])
+.directive('myCustomer', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      customerInfo: '=info'
+    },
+    templateUrl: 'my-customer-plus-vojta.html'
+  };
+});
+-----
+Name: {{customerInfo.name}} Address: {{customerInfo.address}}
+<hr>
+Name: {{vojta.name}} Address: {{vojta.address}}
+-----
+<div ng-controller="Controller">
+  <my-customer info="naomi"></my-customer>
+</div>
+
+Notice that {{vojta.name}} and {{vojta.address}} are empty, meaning they are undefined. 
+注意{{vojta.name}} 和 {{vojta.address}}将显示为空，代表它们是未定义的。
+Although we defined vojta in the controller, it's not available within the directive.
+尽管我们在控制器里定义了vojta，但它在指令中是不可访问的。
+As the name suggests, the isolate scope of the directive isolates everything except models that you've explicitly added to the scope: {} hash object. 
+顾名思义，指令的隔离作用域隔离了所有东西，除了你在scope对象里明确添加的那些。
+This is helpful when building reusable components because it prevents a component from changing your model state except for the models that you explicitly pass in.
+这在构建可复用的组件时是很有用的，因为它防止了组件改变你的model的状态，除非这些model是你明确引入的。 
+
+Note: Normally, a scope prototypically inherits from its parent.
+注意：通常来说，一个作用域原型继承于他的父级作用域。
+An isolated scope does not. 
+但一个隔离作用域不是这样。
+Best Practice: Use the scope option to create isolate scopes when making components that you want to reuse throughout your app.
+最佳实践：如果你要构建在你的app里的可复用组件的话，就在作用域选项里使用隔离作用域。
+
+Creating a Directive that Manipulates the DOM
+构建操作DOM的指令
+In this example we will build a directive that displays the current time. 
+在这个例子里，我们要构建一个显示当前时间的指令。
+Once a second, it updates the DOM to reflect the current time.
+每秒更新DOM来显示当前时间。
+
+Directives that want to modify the DOM typically use the link option. 
+通常使用link选项来让指令修改DOM。
+link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+link返回一个方法，签名为：function link(scope, element, attrs) { ... }
+scope is an Angular scope object.
+scope是一个angular作用域对象。
+element is the jqLite-wrapped element that this directive matches.
+element是指令匹配的那个元素的jqLite对象。
+attrs is a hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
+attrs是指令修饰的元素里的属性的key-value键值对形式的对象。
+
+In our link function, we want to update the displayed time once a second, 
+在我们的link方法中，我们希望每秒更新一下显示时间，
+or whenever a user changes the time formatting string that our directive binds to. 
+用户也可以改变指令里绑定的时间显示格式。
+We will use the $interval service to call a handler on a regular basis. 
+我们使用$interval服务来执行定期调用。
+This is easier than using $timeout.
+这要比使用$timeout容易，
+We also want to remove the $interval if the directive is deleted so we don't introduce a memory leak.
+我们还需要在指令被删除时移除$interval以防止内存泄露。
+angular.module('docsTimeDirective', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.format = 'M/d/yy h:mm:ss a';
+}])
+.directive('myCurrentTime', ['$interval', 'dateFilter', function($interval, dateFilter) {
+    function link(scope, element, attrs) {
+    var format,
+        timeoutId;
+    function updateTime() {
+      element.text(dateFilter(new Date(), format));
+    }
+    scope.$watch(attrs.myCurrentTime, function(value) {
+      format = value;
+      updateTime();
+    });
+    element.on('$destroy', function() {
+      $interval.cancel(timeoutId);
+    });
+    // start the UI update process; save the timeoutId for canceling
+    timeoutId = $interval(function() {
+      updateTime(); // update DOM
+    }, 1000);
+  }
+  return {
+    link: link
+  };
+}]);
+<div ng-controller="Controller">
+  Date format: <input ng-model="format"> <hr/>
+  Current time is: <span my-current-time="format"></span>
+</div>
+
+There are a couple of things to note here. 
+这里有许多值得注意的事情。
+Just like the module.controller API, the function argument in module.directive is dependency injected. 
+和module.controller API一样，module.directive的方法参数可以被依赖注入。
+Because of this, we can use $interval and dateFilter inside our directive's link function.
+所以，我们把$interval和dateFilter注入进指令的link方法。
+We register an event element.on('$destroy', ...). 
+我们注册了一个事件在element.on('$destroy', ...)上面。
+
+Best Practice: Directives should clean up after themselves. 
+最佳实践：指令结束时需要做清理。
+You can use element.on('$destroy', ...) or scope.$on('$destroy', ...) to run a clean-up function when the directive is removed.
+在指令被移除时，你可以使用element.on('$destroy', ...) 或 scope.$on('$destroy', ...)来运行清理方法。
+
+Creating a Directive that Wraps Other Elements
+创建包含其他元素的指令
+We've seen that you can pass in models to a directive using the isolate scope, 
+我们已经看过了把一个model传到使用了隔离作用域的指令中，
+but sometimes it's desirable to be able to pass in an entire template rather than a string or an object. 
+不过有时，传递一个完整的模板要好过传递一个字符串或者一个对象。
+Let's say that we want to create a "dialog box" component. 
+我们试着创建一个对话框组件。
+The dialog box should be able to wrap any arbitrary content.
+这个对话框要可以包含任意的内容。
+
+To do this, we need to use the transclude option.
+为了实现这个，我们需要使用transclude选项。
+angular.module('docsTransclusionDirective', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.name = 'Tobias';
+}])
+.directive('myDialog', function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    templateUrl: 'my-dialog.html'
+  };
+});
+------------
+<div class="alert" ng-transclude>
+</div>
+------------
+<div ng-controller="Controller">
+  <my-dialog>Check out the contents, {{name}}!</my-dialog>
+</div>
+
+What does this transclude option do, exactly? 
+transclude选项做了什么？
+transclude makes the contents of a directive with this option have access to the scope outside of the directive rather than inside.
+transclide使得可以访问外部作用域而不是内部作用域来得到指令需要显示的内容。
+
+To illustrate this, see the example below. 
+为了说明这点，看下面的例子。
+Notice that we've added a link function in script.js that redefines name as Jeff. 
+注意我们添加了一个link方法，里面用Jeff来重定义了name。
+What do you think the {{name}} binding will resolve to now?
+你认为name会显示什么？
+angular.module('docsTransclusionExample', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.name = 'Tobias';
+}])
+.directive('myDialog', function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: {},
+    templateUrl: 'my-dialog.html',
+    link: function (scope, element) {
+      scope.name = 'Jeff';
+    }
+  };
+});
+------------
+<div class="alert" ng-transclude>
+</div>
+------------
+<div ng-controller="Controller">
+  <my-dialog>Check out the contents, {{name}}!</my-dialog>
+</div>
+
+Ordinarily, we would expect that {{name}} would be Jeff. However, we see in this example that the {{name}} binding is still Tobias.
+
+The transclude option changes the way scopes are nested. It makes it so that the contents of a transcluded directive have whatever scope is outside the directive, rather than whatever scope is on the inside. In doing so, it gives the contents access to the outside scope.
+
+Note that if the directive did not create its own scope, then scope in scope.name = 'Jeff'; would reference the outside scope and we would see Jeff in the output.
+
+This behavior makes sense for a directive that wraps some content, because otherwise you'd have to pass in each model you wanted to use separately. If you have to pass in each model that you want to use, then you can't really have arbitrary contents, can you?
+
+Best Practice: only use transclude: true when you want to create a directive that wraps arbitrary content.
+Next, we want to add buttons to this dialog box, and allow someone using the directive to bind their own behavior to it.
+angular.module('docsIsoFnBindExample', [])
+.controller('Controller', ['$scope', '$timeout', function($scope, $timeout) {
+  $scope.name = 'Tobias';
+  $scope.message = '';
+  $scope.hideDialog = function (message) {
+    $scope.message = message;
+    $scope.dialogIsHidden = true;
+    $timeout(function () {
+      $scope.message = '';
+      $scope.dialogIsHidden = false;
+    }, 2000);
+  };
+}])
+.directive('myDialog', function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      'close': '&onClose'
+    },
+    templateUrl: 'my-dialog-close.html'
+  };
+});
+---------
+<div class="alert">
+  <a href class="close" ng-click="close({message: 'closing for now'})">&times;</a>
+  <div ng-transclude></div>
+</div>
+----------
+<div ng-controller="Controller">
+  {{message}}
+  <my-dialog ng-hide="dialogIsHidden" on-close="hideDialog(message)">
+    Check out the contents, {{name}}!
+  </my-dialog>
+</div>
+
+We want to run the function we pass by invoking it from the directive's scope, but have it run in the context of the scope where it's registered.
+
+We saw earlier how to use =attr in the scope option, but in the above example, we're using &attr instead. The & binding allows a directive to trigger evaluation of an expression in the context of the original scope, at a specific time. Any legal expression is allowed, including an expression which contains a function call. Because of this, & bindings are ideal for binding callback functions to directive behaviors.
+
+When the user clicks the x in the dialog, the directive's close function is called, thanks to ng-click. This call to close on the isolated scope actually evaluates the expression hideDialog(message) in the context of the original scope, thus running Controller's hideDialog function.
+
+Often it's desirable to pass data from the isolate scope via an expression to the parent scope, this can be done by passing a map of local variable names and values into the expression wrapper fn. For example, the hideDialog function takes a message to display when the dialog is hidden. This is specified in the directive by calling close({message: 'closing for now'}). Then the local variable message will be available within the on-close expression.
+
+Best Practice: use &attr in the scope option when you want your directive to expose an API for binding to behaviors.

@@ -29,3 +29,152 @@ Best Practice: Prefer using directives via tag name and attributes over comment 
 Doing so generally makes it easier to determine what directives a given element matches.
 这样做的话，通常来说会使得确定哪个指令和给定元素相匹配的过程更容易。
 
+Creating Directives
+创建指令
+First let's talk about the API for registering directives. 
+首先让我们看下注册指令的API。
+Much like controllers, directives are registered on modules. 
+和控制器一样，指令被注册给模块。
+To register a directive, you use the module.directive API. 
+使用module.directive API来注册指令。
+module.directive takes the normalized directive name followed by a factory function. 
+module.directive接受一个标准化的指令名称，后面跟着一个工厂方法。
+This factory function should return an object with the different options to tell $compile how the directive should behave when matched.
+工厂方法应该返回一个对象，对象有许多不同的设置选项，来告诉编译器当这个指令被匹配时，指令的行为是怎么样的。
+
+The factory function is invoked only once when the compiler matches the directive for the first time. 
+只有在编译器第一次匹配指令时，工厂方法才被调用。
+You can perform any initialization work here. 
+你可以在此时做任何的初始化的工作。
+The function is invoked using $injector.invoke which makes it injectable just like a controller.
+工厂方法被$injector.invoke调用，所以它可以像控制器一样，可以使用依赖注入。
+
+Best Practice: Prefer using the definition object over returning a function.
+最佳实践：返回对象好过返回一个方法。
+We'll go over a few common examples of directives, then dive deep into the different options and compilation process.
+我们来看一些普通的指令的例子，然后再深入到不同的选项和编译过程中。
+Best Practice: In order to avoid collisions with some future standard, it's best to prefix your own directive names.
+最佳实践：为了避免和未来的标准发生冲突，自定义指令最好加上你独特的前缀。
+Similarly, do not prefix your own directives with ng or they might conflict with directives included in a future version of Angular.
+同样的，不要用ng来前缀你的自定义指令，这样有可能会和未来的angular版本中的内置指令相冲突。
+For the following examples, we'll use the prefix my.
+在下面的例子中，我们使用my来做前缀。
+
+Template-expanding directive
+模板扩展指令
+Let's say you have a chunk of your template that represents a customer's information.
+我们需要一块模板，来显示客户的信息。
+This template is repeated many times in your code. 
+这个模板在代码里会出现在好多地方。
+When you change it in one place, you have to change it in several others. 
+当发生更改时，就必须同时更改好几个地方。
+This is a good opportunity to use a directive to simplify your template.
+这是使用指令去简化你的模板的好机会。
+
+Let's create a directive that simply replaces its contents with a static template:
+我们来创建一个指令，用一个静态模板来替换内容：
+angular.module('docsSimpleDirective', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.customer = {
+    name: 'Naomi',
+    address: '1600 Amphitheatre'
+  };
+}])
+.directive('myCustomer', function() {
+  return {
+    template: 'Name: {{customer.name}} Address: {{customer.address}}'
+  };
+});
+<div ng-controller="Controller">
+  <div my-customer></div>
+</div>
+
+Notice that we have bindings in this directive. 
+注意我们在指令中使用了数据绑定。
+After $compile compiles and links <div my-customer></div>, it will try to match directives on the element's children.
+在编译器编译和链接了<div my-customer></div>之后，它会试着在子元素上匹配指令。
+This means you can compose directives of other directives. 
+这意味着，你可以在一个指令中组合其他的指令。
+
+In the example above we in-lined the value of the template option, but this will become annoying as the size of your template grows.
+在上面的例子中，我们使用了内联模板选项，这会造成恼人的模板尺寸变大的问题。
+
+Best Practice: Unless your template is very small, it's typically better to break it apart into its own HTML file and load it with the templateUrl option.
+最佳实践：除非你的模板很小，否则通常来说，把它们放到一个单独的HTML文件，用templateUrl选项来加载它们比较好。
+If you are familiar with ngInclude, templateUrl works just like it. Here's the same example using templateUrl instead:
+如果你熟悉ngInclude，templateUrl和它很相像。这是使用templateUrl的例子：
+angular.module('docsTemplateUrlDirective', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.customer = {
+    name: 'Naomi',
+    address: '1600 Amphitheatre'
+  };
+}])
+.directive('myCustomer', function() {
+  return {
+    templateUrl: 'my-customer.html'
+  };
+});
+--------
+Name: {{customer.name}} Address: {{customer.address}}
+--------
+<div ng-controller="Controller">
+  <div my-customer></div>
+</div>
+
+templateUrl can also be a function which returns the URL of an HTML template to be loaded and used for the directive. 
+templateUrl也能够是一个方法，它返回HTML模板的URL。
+Angular will call the templateUrl function with two parameters: the element that the directive was called on, and an attr object associated with that element.
+Angular会用两个参数来调用templateUrl方法：指令在上面执行的那个元素、以及这个元素关联的属性的对象
+Note: You do not currently have the ability to access scope variables from the templateUrl function, since the template is requested before the scope is initialized.
+注意：目前，你还没有访问templateUrl方法的作用域的权限，因为模板的请求先于作用域的初始化。
+angular.module('docsTemplateUrlDirective', [])
+.controller('Controller', ['$scope', function($scope) {
+  $scope.customer = {
+    name: 'Naomi',
+    address: '1600 Amphitheatre'
+  };
+}])
+.directive('myCustomer', function() {
+  return {
+    templateUrl: function(elem, attr){
+      return 'customer-'+attr.type+'.html';
+    }
+  };
+});
+------
+Name: {{customer.name}}
+Address: {{customer.address}}
+------
+<div ng-controller="Controller">
+  <div my-customer type="name"></div>
+  <div my-customer type="address"></div>
+</div>
+
+Note: When you create a directive, it is restricted to attribute and elements only by default. 
+注意：当你创建一个指令时，默认是使用属性和元素。
+In order to create directives that are triggered by class name, you need to use the restrict option.
+为了创建类名的指令，你需要改变restrict选项。
+The restrict option is typically set to:
+restrict选项可以被设置为：
+'A' - only matches attribute name 属性
+'E' - only matches element name   元素
+'C' - only matches class name     类名
+These restrictions can all be combined as needed:
+restrict选项也可以组合来使用：
+'AEC'
+“AEC”
+
+When should I use an attribute versus an element?
+怎么选择到底是使用属性模式还是元素模式？
+Use an element when you are creating a component that is in control of the template. 
+当你创建一个完全控制模板的组件时，使用元素模式。
+The common case for this is when you are creating a Domain-Specific Language for parts of your template. 
+这样做的理由是，你是在给你的模板创建一种领域特定语言。
+Use an attribute when you are decorating an existing element with new functionality.
+而当你是在给一个已存在的元素添加一些新功能时，使用属性。
+Using an element for the myCustomer directive is clearly the right choice because you're not decorating an element with some "customer" behavior; 
+在我们的myCistomer指令中，使用元素模式是更好的选择，因为我们并不是给什么customer元素扩展行为；
+you're defining the core behavior of the element as a customer component.
+我们是在给客户信息组件定义核心行为。
+

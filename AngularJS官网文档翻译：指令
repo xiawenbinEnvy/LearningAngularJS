@@ -464,16 +464,36 @@ angular.module('docsTransclusionExample', [])
   <my-dialog>Check out the contents, {{name}}!</my-dialog>
 </div>
 
-Ordinarily, we would expect that {{name}} would be Jeff. However, we see in this example that the {{name}} binding is still Tobias.
+Ordinarily, we would expect that {{name}} would be Jeff. 
+按理来说，我们以为name会显示为Jeff。
+However, we see in this example that the {{name}} binding is still Tobias.
+然而，在这个例子里，我们看到name还是和Tobias绑定在一起了。
 
-The transclude option changes the way scopes are nested. It makes it so that the contents of a transcluded directive have whatever scope is outside the directive, rather than whatever scope is on the inside. In doing so, it gives the contents access to the outside scope.
+The transclude option changes the way scopes are nested. 
+transclude选项改变了scope嵌套的方式。
+It makes it so that the contents of a transcluded directive have whatever scope is outside the directive, 
+它使得tansclude指令的内容使用的是外部scope，
+rather than whatever scope is on the inside. 
+而不是内部scope。
+In doing so, it gives the contents access to the outside scope.
+所以，它给予了内容访问外部作用域的权限。
 
-Note that if the directive did not create its own scope, then scope in scope.name = 'Jeff'; would reference the outside scope and we would see Jeff in the output.
+Note that if the directive did not create its own scope, 
+注意如果指令没有创建它自己的作用域，
+then scope in scope.name = 'Jeff'; would reference the outside scope and we would see Jeff in the output.
+scope.name='jeff'这句语句所使用的scope将会引用外部作用域，使得显示为Jeff。
 
-This behavior makes sense for a directive that wraps some content, because otherwise you'd have to pass in each model you wanted to use separately. If you have to pass in each model that you want to use, then you can't really have arbitrary contents, can you?
+This behavior makes sense for a directive that wraps some content, 
+这个特性使得包含内容的指令变得有意义，
+because otherwise you'd have to pass in each model you wanted to use separately. 
+If you have to pass in each model that you want to use, 
+then you can't really have arbitrary contents, can you?
+（上面三句不知道怎么翻译）
 
 Best Practice: only use transclude: true when you want to create a directive that wraps arbitrary content.
+最佳实践：只有在你想要创建一个可以包含任意内容的指令时，才使用tranclude:true。
 Next, we want to add buttons to this dialog box, and allow someone using the directive to bind their own behavior to it.
+接下来，我们要给对话框添加一个按钮，并且允许别人在指令上绑定他们的自定义行为。
 angular.module('docsIsoFnBindExample', [])
 .controller('Controller', ['$scope', '$timeout', function($scope, $timeout) {
   $scope.name = 'Tobias';
@@ -510,12 +530,36 @@ angular.module('docsIsoFnBindExample', [])
   </my-dialog>
 </div>
 
-We want to run the function we pass by invoking it from the directive's scope, but have it run in the context of the scope where it's registered.
+We want to run the function we pass by invoking it from the directive's scope, 
+but have it run in the context of the scope where it's registered.
+（上面两句不知道怎么翻译）
 
-We saw earlier how to use =attr in the scope option, but in the above example, we're using &attr instead. The & binding allows a directive to trigger evaluation of an expression in the context of the original scope, at a specific time. Any legal expression is allowed, including an expression which contains a function call. Because of this, & bindings are ideal for binding callback functions to directive behaviors.
+We saw earlier how to use =attr in the scope option, but in the above example, we're using &attr instead. 
+我们先前看到了怎么在scope选项里使用=attr，但是在上面的例子里，我们使用了&attr。
+The & binding allows a directive to trigger evaluation of an expression in the context of the original scope, at a specific time. 
+&符号允许指令在特定时间去触发位于原始作用域的上下文里的表达式，
+Any legal expression is allowed, including an expression which contains a function call. 
+任何合法的表达式都可以，包括包含方法调用的表达式。
+Because of this, & bindings are ideal for binding callback functions to directive behaviors.
+所以，&绑定成为了绑定指令的回调函数的理想的地方。
 
-When the user clicks the x in the dialog, the directive's close function is called, thanks to ng-click. This call to close on the isolated scope actually evaluates the expression hideDialog(message) in the context of the original scope, thus running Controller's hideDialog function.
+When the user clicks the x in the dialog, the directive's close function is called, thanks to ng-click. 
+因为有ng-click存在，当你点击对话框里的x时，指令的关闭方法被调用。
+This call to close on the isolated scope actually evaluates the expression hideDialog(message) in the context of the original scope, 
+它调用了隔离作用域里的close，然后调用了原始作用域上下文里的hideDialog(message)表达式，
+thus running Controller's hideDialog function.
+从而运行了控制器里的hideDialog方法。
 
-Often it's desirable to pass data from the isolate scope via an expression to the parent scope, this can be done by passing a map of local variable names and values into the expression wrapper fn. For example, the hideDialog function takes a message to display when the dialog is hidden. This is specified in the directive by calling close({message: 'closing for now'}). Then the local variable message will be available within the on-close expression.
+Often it's desirable to pass data from the isolate scope via an expression to the parent scope,
+这个特性适合于从隔离作用域里通过表达式传递数据到父级作用域里，
+this can be done by passing a map of local variable names and values into the expression wrapper fn. 
+（不会翻译）
+For example, the hideDialog function takes a message to display when the dialog is hidden. 
+比如，当对话框隐藏时，hideDialog方法获得了一条提示并把它显示了出来。
+This is specified in the directive by calling close({message: 'closing for now'}). 
+这是定义在在指令中并通过调用close({message: 'closing for now'})来实现的。
+Then the local variable message will be available within the on-close expression.
+然后，本地变量提示信息会通过on-close表达式显示出来。
 
 Best Practice: use &attr in the scope option when you want your directive to expose an API for binding to behaviors.
+最佳实践：当你想要你的指令暴露出api来绑定行为时，就使用&attr作用域选项。

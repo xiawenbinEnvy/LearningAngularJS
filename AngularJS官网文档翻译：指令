@@ -707,16 +707,25 @@ Just like ngController, this option attaches a controller to the template of the
 就像ngController，这个选项把控制器和指令的模板相连接了起来。
 
 If it is necessary to reference the controller or any functions bound to the controller's scope in the template, 
+如果必须在模板内的控制器的作用域内引用控制器或任何方法（感觉翻得不对）
 you can use the option controllerAs to specify the name of the controller as an alias. 
+你可以使用controllerAs选项去指定控制器的名字，作为一个别名。
 The directive needs to define a scope for this configuration to be used. 
+（翻不来）
 This is particularly useful in the case when the directive is used as a component.
+这在指令是作为一个组件被使用时十分有用。
 
 Looking back at myPane's definition, notice the last argument in its link function: tabsCtrl.
+回过去看myPane的定义，注意最后一个参数是link方法：tabsCtrl。
 When a directive requires a controller, it receives that controller as the fourth argument of its link function. 
+当一个指令需要一个控制器时，就由这个第四个link参数来提供。
 Taking advantage of this, myPane can call the addPane function of myTabs.
+所以，myPane就可以调用myTabs里的addPane方法了。
 
 If multiple controllers are required, the require option of the directive can take an array argument. 
+如果需要多个控制器，指令的require选项可以接收参数数组。
 The corresponding parameter being sent to the link function will also be an array.
+被发送给link方法的相应的参数也可以是一个数组。
 angular.module('docsTabsExample', [])
 .directive('myPane', function() {
   return {
@@ -737,8 +746,18 @@ angular.module('docsTabsExample', [])
 });
 
 Savvy readers may be wondering what the difference is between link and controller. 
+精明的读者可能想知道link和controller之间的区别在哪里。
 The basic difference is that controller can expose an API, and link functions can interact with controllers using require.
+最基本的区别点在于，控制器可以暴露出api，link可以通过require来和contoller相连接。
 
 Best Practice: use controller when you want to expose an API to other directives. Otherwise use link.
+最佳实践：当你想暴露api给别的指令时，使用控制器，否则使用link。
+
+Summary
+总结
+Here we've seen the main use cases for directives. 
+我们已经看到了指令的主要用法了。
+Each of these samples acts as a good starting point for creating your own directives.
+这里的每一个例子都是你创建自己的指令的好的起点。
 
 

@@ -563,3 +563,182 @@ Then the local variable message will be available within the on-close expression
 
 Best Practice: use &attr in the scope option when you want your directive to expose an API for binding to behaviors.
 最佳实践：当你想要你的指令暴露出api来绑定行为时，就使用&attr作用域选项。
+
+Creating a Directive that Adds Event Listeners
+创建添加了事件监听器的指令
+Previously, we used the link function to create a directive that manipulated its DOM elements. 
+先前，我们使用了link去创建可以操纵DOM元素的指令。
+Building upon that example, let's make a directive that reacts to events on its elements.
+基于那个例子，我们来创建可以响应元素上的事件的指令。
+
+For instance, what if we wanted to create a directive that lets a user drag an element?
+比如，创建一个可以让用户拖曳元素的指令
+angular.module('dragModule', [])
+.directive('myDraggable', ['$document', function($document) {
+  return {
+    link: function(scope, element, attr) {
+      var startX = 0, startY = 0, x = 0, y = 0;
+
+      element.css({
+       position: 'relative',
+       border: '1px solid red',
+       backgroundColor: 'lightgrey',
+       cursor: 'pointer'
+      });
+
+      element.on('mousedown', function(event) {
+        // Prevent default dragging of selected content
+        event.preventDefault();
+        startX = event.pageX - x;
+        startY = event.pageY - y;
+        $document.on('mousemove', mousemove);
+        $document.on('mouseup', mouseup);
+      });
+
+      function mousemove(event) {
+        y = event.pageY - startY;
+        x = event.pageX - startX;
+        element.css({
+          top: y + 'px',
+          left:  x + 'px'
+        });
+      }
+
+      function mouseup() {
+        $document.off('mousemove', mousemove);
+        $document.off('mouseup', mouseup);
+      }
+    }
+  };
+}]);
+<span my-draggable>Drag ME</span>
+
+Creating Directives that Communicate
+创建可以互相沟通的指令（怎么翻译？）
+You can compose any directives by using them within templates.
+你可以通过在模板中使用指令来组合指令。
+
+Sometimes, you want a component that's built from a combination of directives.
+有时，你想要通过指令的组合来创建一个组件
+
+Imagine you want to have a container with tabs in which the contents of the container correspond to which tab is active.
+想象你想要一个带有tab的容易，并且tab被选中时，容器会显示响应的内容。
+angular.module('docsTabsExample', [])
+.directive('myTabs', function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: {},
+    controller: function($scope) {
+      var panes = $scope.panes = [];
+
+      $scope.select = function(pane) {
+        angular.forEach(panes, function(pane) {
+          pane.selected = false;
+        });
+        pane.selected = true;
+      };
+
+      this.addPane = function(pane) {
+        if (panes.length === 0) {
+          $scope.select(pane);
+        }
+        panes.push(pane);
+      };
+    },
+    templateUrl: 'my-tabs.html'
+  };
+})
+.directive('myPane', function() {
+  return {
+    require: '^myTabs',
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      title: '@'
+    },
+    link: function(scope, element, attrs, tabsCtrl) {
+      tabsCtrl.addPane(scope);
+    },
+    templateUrl: 'my-pane.html'
+  };
+});
+----------
+<div class="tab-pane" ng-show="selected" ng-transclude>
+</div>
+----------
+<div class="tabbable">
+  <ul class="nav nav-tabs">
+    <li ng-repeat="pane in panes" ng-class="{active:pane.selected}">
+      <a href="" ng-click="select(pane)">{{pane.title}}</a>
+    </li>
+  </ul>
+  <div class="tab-content" ng-transclude></div>
+</div>
+----------
+<my-tabs>
+  <my-pane title="Hello">
+    <h4>Hello</h4>
+    <p>Lorem ipsum dolor sit amet</p>
+  </my-pane>
+  <my-pane title="World">
+    <h4>World</h4>
+    <em>Mauris elementum elementum enim at suscipit.</em>
+    <p><a href ng-click="i = i + 1">counter: {{i || 0}}</a></p>
+  </my-pane>
+</my-tabs>
+
+The myPane directive has a require option with value ^myTabs.
+myPane指令有一个值为^myTabs的require选项。
+When a directive uses this option, $compile will throw an error unless the specified controller is found. 
+当指令使用这个选项时，除非指定的控制器存在，否则编译器将抛出异常。
+The ^ prefix means that this directive searches for the controller on its parents 
+^ 前缀表示让指令在父级元素里面寻找指定的控制器
+(without the ^ prefix, the directive would look for the controller on just its own element).
+(如果没有 ^ 前缀，指令将在它自己的元素里寻找指定的控制器)。
+
+So where does this myTabs controller come from? 
+myTabs控制器从何而来？
+Directives can specify controllers using the unsurprisingly named controller option. 
+指令可以通过命名约定规范的方式来寻找到指定的控制器。
+As you can see, the myTabs directive uses this option. 
+正如你所见，myTabs指令就是这样做的。
+Just like ngController, this option attaches a controller to the template of the directive.
+就像ngController，这个选项把控制器和指令的模板相连接了起来。
+
+If it is necessary to reference the controller or any functions bound to the controller's scope in the template, 
+you can use the option controllerAs to specify the name of the controller as an alias. 
+The directive needs to define a scope for this configuration to be used. 
+This is particularly useful in the case when the directive is used as a component.
+
+Looking back at myPane's definition, notice the last argument in its link function: tabsCtrl.
+When a directive requires a controller, it receives that controller as the fourth argument of its link function. 
+Taking advantage of this, myPane can call the addPane function of myTabs.
+
+If multiple controllers are required, the require option of the directive can take an array argument. 
+The corresponding parameter being sent to the link function will also be an array.
+angular.module('docsTabsExample', [])
+.directive('myPane', function() {
+  return {
+    require: ['^myTabs', '^ngModel'],
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      title: '@'
+    },
+    link: function(scope, element, attrs, controllers) {
+      var tabsCtrl = controllers[0],
+          modelCtrl = controllers[1];
+
+      tabsCtrl.addPane(scope);
+    },
+    templateUrl: 'my-pane.html'
+  };
+});
+
+Savvy readers may be wondering what the difference is between link and controller. 
+The basic difference is that controller can expose an API, and link functions can interact with controllers using require.
+
+Best Practice: use controller when you want to expose an API to other directives. Otherwise use link.
+
+

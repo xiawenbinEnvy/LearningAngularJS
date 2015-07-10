@@ -5,8 +5,11 @@ Creating Custom Directives
 
 What are Directives?
 什么是指令
-At a high level, directives are markers on a DOM element (such as an attribute, element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM element or even transform the DOM element and its children.
-在一个比较高的层次上来说，指令是DOM元素（比如作为属性、元素名、注释或类名）上的标记，用来告诉angular的HTML编译器在这个DOM元素上添加一些指定行为，甚至改造这个DOM元素以及它的子元素。
+At a high level, directives are markers on a DOM element (such as an attribute, element name, 
+comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that 
+DOM element or even transform the DOM element and its children.
+在一个比较高的层次上来说，指令是DOM元素（比如作为属性、元素名、注释或类名）上的标记，用来告诉angular的HTML编译器在这个
+DOM元素上添加一些指定行为，甚至改造这个DOM元素以及它的子元素。
 Angular comes with a set of these directives built-in, like ngBind, ngModel, and ngClass. 
 angular有一些内置的指令，比如ngBind、ngClass、ngModel。
 Much like you create controllers and services, you can create your own directives for Angular to use. 
@@ -17,7 +20,8 @@ What does it mean to "compile" an HTML template?
 什么是HTML模板的编译？
 For AngularJS, "compilation" means attaching event listeners to the HTML to make it interactive. 
 对于angularjs来说，编译意味着在HTML上添加事件监听，使它能够进行互动。
-The reason we use the term "compile" is that the recursive process of attaching directives mirrors the process of compiling source code in compiled programming languages.
+The reason we use the term "compile" is that the recursive process of attaching directives mirrors the process of 
+compiling source code in compiled programming languages.
 我们使用“编译”这个词的原因在于，添加指令的这个递归过程借鉴于编译型程序语言编译源代码的过程。
 
 Directive types
@@ -39,7 +43,8 @@ To register a directive, you use the module.directive API.
 使用module.directive API来注册指令。
 module.directive takes the normalized directive name followed by a factory function. 
 module.directive接受一个标准化的指令名称，后面跟着一个工厂方法。
-This factory function should return an object with the different options to tell $compile how the directive should behave when matched.
+This factory function should return an object with the different options to tell $compile how the directive 
+should behave when matched.
 工厂方法应该返回一个对象，对象有许多不同的设置选项，来告诉编译器当这个指令被匹配时，指令的行为是怎么样的。
 
 The factory function is invoked only once when the compiler matches the directive for the first time. 
@@ -55,7 +60,8 @@ We'll go over a few common examples of directives, then dive deep into the diffe
 我们来看一些普通的指令的例子，然后再深入到不同的选项和编译过程中。
 Best Practice: In order to avoid collisions with some future standard, it's best to prefix your own directive names.
 最佳实践：为了避免和未来的标准发生冲突，自定义指令最好加上你独特的前缀。
-Similarly, do not prefix your own directives with ng or they might conflict with directives included in a future version of Angular.
+Similarly, do not prefix your own directives with ng or they might conflict with directives included in a future version 
+of Angular.
 同样的，不要用ng来前缀你的自定义指令，这样有可能会和未来的angular版本中的内置指令相冲突。
 For the following examples, we'll use the prefix my.
 在下面的例子中，我们使用my来做前缀。
@@ -96,10 +102,12 @@ After $compile compiles and links <div my-customer></div>, it will try to match 
 This means you can compose directives of other directives. 
 这意味着，你可以在一个指令中组合其他的指令。
 
-In the example above we in-lined the value of the template option, but this will become annoying as the size of your template grows.
+In the example above we in-lined the value of the template option, but this will become annoying as the size of your 
+template grows.
 在上面的例子中，我们使用了内联模板选项，这会造成恼人的模板尺寸变大的问题。
 
-Best Practice: Unless your template is very small, it's typically better to break it apart into its own HTML file and load it with the templateUrl option.
+Best Practice: Unless your template is very small, it's typically better to break it apart into its own HTML file and load 
+it with the templateUrl option.
 最佳实践：除非你的模板很小，否则通常来说，把它们放到一个单独的HTML文件，用templateUrl选项来加载它们比较好。
 If you are familiar with ngInclude, templateUrl works just like it. Here's the same example using templateUrl instead:
 如果你熟悉ngInclude，templateUrl和它很相像。这是使用templateUrl的例子：
@@ -124,9 +132,11 @@ Name: {{customer.name}} Address: {{customer.address}}
 
 templateUrl can also be a function which returns the URL of an HTML template to be loaded and used for the directive. 
 templateUrl也能够是一个方法，它返回HTML模板的URL。
-Angular will call the templateUrl function with two parameters: the element that the directive was called on, and an attr object associated with that element.
+Angular will call the templateUrl function with two parameters: the element that the directive was called on, 
+and an attr object associated with that element.
 Angular会用两个参数来调用templateUrl方法：指令在上面执行的那个元素、以及这个元素关联的属性的对象
-Note: You do not currently have the ability to access scope variables from the templateUrl function, since the template is requested before the scope is initialized.
+Note: You do not currently have the ability to access scope variables from the templateUrl function, 
+since the template is requested before the scope is initialized.
 注意：目前，你还没有访问templateUrl方法的作用域的权限，因为模板的请求先于作用域的初始化。
 angular.module('docsTemplateUrlDirective', [])
 .controller('Controller', ['$scope', function($scope) {
@@ -173,7 +183,8 @@ The common case for this is when you are creating a Domain-Specific Language for
 这样做的理由是，你是在给你的模板创建一种领域特定语言。
 Use an attribute when you are decorating an existing element with new functionality.
 而当你是在给一个已存在的元素添加一些新功能时，使用属性。
-Using an element for the myCustomer directive is clearly the right choice because you're not decorating an element with some "customer" behavior; 
+Using an element for the myCustomer directive is clearly the right choice because you're not 
+decorating an element with some "customer" behavior; 
 在我们的myCistomer指令中，使用元素模式是更好的选择，因为我们并不是给什么customer元素扩展行为；
 you're defining the core behavior of the element as a customer component.
 我们是在给客户信息组件定义核心行为。
@@ -220,7 +231,8 @@ Name: {{customer.name}} Address: {{customer.address}}
 This is clearly not a great solution.
 这显然不是一个好的解决方案。
 
-What we want to be able to do is separate the scope inside a directive from the scope outside, and then map the outer scope to a directive's inner scope.
+What we want to be able to do is separate the scope inside a directive from the scope outside, 
+and then map the outer scope to a directive's inner scope.
 我们要做的，是需要分离指令内部的作用域和指令外部的作用域，然后把外部作用域和指令内部的作用域联系起来。
 We can do this by creating what we call an isolate scope.
 我们用隔离作用域来实现这件事。
@@ -249,7 +261,8 @@ Name: {{customerInfo.name}} Address: {{customerInfo.address}}
   <my-customer info="igor"></my-customer>
 </div>
 
-Looking at index.html, the first <my-customer> element binds the info attribute to naomi, which we have exposed on our controller's scope. 
+Looking at index.html, the first <my-customer> element binds the info attribute to naomi, 
+which we have exposed on our controller's scope. 
 看一下index.html，第一个<my-customer>元素的info属性和naomi绑定，naomi在我们的控制器的作用域内暴露出来。
 The second binds info to igor.
 另一个绑定给了igor。
@@ -272,7 +285,8 @@ Note: These =attr attributes in the scope option of directives are normalized ju
 注意：指令的作用域选项里的=attr属性被设置为很像指令的名字。
 To bind to the attribute in <div bind-to-this="thing">, you'd specify a binding of =bindToThis.
 为了绑定<div bind-to-this="thing">，你需要将其命名为=bindToThis。
-For cases where the attribute name is the same as the value you want to bind to inside the directive's scope, you can use this shorthand syntax:
+For cases where the attribute name is the same as the value you want to bind to inside the directive's scope, 
+you can use this shorthand syntax:
 如果，要绑定的隔离作用域里的值和属性名完全一样的话，你可以用这样的简写语法：
 ...
 scope: {
@@ -280,10 +294,12 @@ scope: {
   customer: '='
 },
 ...
-Besides making it possible to bind different data to the scope inside a directive, using an isolated scope has another effect.
+Besides making it possible to bind different data to the scope inside a directive, using an isolated scope 
+has another effect.
 除了绑定不同的数据到指令内部的隔离作用域上使用隔离作用域还有别的作用。
 
-We can show this by adding another property, vojta, to our scope and trying to access it from within our directive's template:
+We can show this by adding another property, vojta, to our scope and trying to access it from 
+within our directive's template:
 我们可以增加另外一个属性，vojta，到我们的作用域里，然后在我们的指令的模板里访问它来展示这个作用：
 angular.module('docsIsolationExample', [])
 .controller('Controller', ['$scope', function($scope) {
@@ -312,16 +328,19 @@ Notice that {{vojta.name}} and {{vojta.address}} are empty, meaning they are und
 注意{{vojta.name}} 和 {{vojta.address}}将显示为空，代表它们是未定义的。
 Although we defined vojta in the controller, it's not available within the directive.
 尽管我们在控制器里定义了vojta，但它在指令中是不可访问的。
-As the name suggests, the isolate scope of the directive isolates everything except models that you've explicitly added to the scope: {} hash object. 
+As the name suggests, the isolate scope of the directive isolates everything except models that you've explicitly 
+added to the scope: {} hash object. 
 顾名思义，指令的隔离作用域隔离了所有东西，除了你在scope对象里明确添加的那些。
-This is helpful when building reusable components because it prevents a component from changing your model state except for the models that you explicitly pass in.
+This is helpful when building reusable components because it prevents a component from changing your model state 
+except for the models that you explicitly pass in.
 这在构建可复用的组件时是很有用的，因为它防止了组件改变你的model的状态，除非这些model是你明确引入的。 
 
 Note: Normally, a scope prototypically inherits from its parent.
 注意：通常来说，一个作用域原型继承于他的父级作用域。
 An isolated scope does not. 
 但一个隔离作用域不是这样。
-Best Practice: Use the scope option to create isolate scopes when making components that you want to reuse throughout your app.
+Best Practice: Use the scope option to create isolate scopes when making components that you want to reuse throughout 
+your app.
 最佳实践：如果你要构建在你的app里的可复用组件的话，就在作用域选项里使用隔离作用域。
 
 Creating a Directive that Manipulates the DOM
@@ -395,7 +414,8 @@ We register an event element.on('$destroy', ...).
 
 Best Practice: Directives should clean up after themselves. 
 最佳实践：指令结束时需要做清理。
-You can use element.on('$destroy', ...) or scope.$on('$destroy', ...) to run a clean-up function when the directive is removed.
+You can use element.on('$destroy', ...) or scope.$on('$destroy', ...) to run a clean-up function when the directive is 
+removed.
 在指令被移除时，你可以使用element.on('$destroy', ...) 或 scope.$on('$destroy', ...)来运行清理方法。
 
 Creating a Directive that Wraps Other Elements
@@ -432,7 +452,8 @@ angular.module('docsTransclusionDirective', [])
 
 What does this transclude option do, exactly? 
 transclude选项做了什么？
-transclude makes the contents of a directive with this option have access to the scope outside of the directive rather than inside.
+transclude makes the contents of a directive with this option have access to the scope outside of the directive rather 
+than inside.
 transclide使得可以访问外部作用域而不是内部作用域来得到指令需要显示的内容。
 
 To illustrate this, see the example below. 
@@ -536,7 +557,8 @@ but have it run in the context of the scope where it's registered.
 
 We saw earlier how to use =attr in the scope option, but in the above example, we're using &attr instead. 
 我们先前看到了怎么在scope选项里使用=attr，但是在上面的例子里，我们使用了&attr。
-The & binding allows a directive to trigger evaluation of an expression in the context of the original scope, at a specific time. 
+The & binding allows a directive to trigger evaluation of an expression in the context of the original scope, 
+at a specific time. 
 &符号允许指令在特定时间去触发位于原始作用域的上下文里的表达式，
 Any legal expression is allowed, including an expression which contains a function call. 
 任何合法的表达式都可以，包括包含方法调用的表达式。
@@ -545,7 +567,8 @@ Because of this, & bindings are ideal for binding callback functions to directiv
 
 When the user clicks the x in the dialog, the directive's close function is called, thanks to ng-click. 
 因为有ng-click存在，当你点击对话框里的x时，指令的关闭方法被调用。
-This call to close on the isolated scope actually evaluates the expression hideDialog(message) in the context of the original scope, 
+This call to close on the isolated scope actually evaluates the expression hideDialog(message) in the context 
+of the original scope, 
 它调用了隔离作用域里的close，然后调用了原始作用域上下文里的hideDialog(message)表达式，
 thus running Controller's hideDialog function.
 从而运行了控制器里的hideDialog方法。

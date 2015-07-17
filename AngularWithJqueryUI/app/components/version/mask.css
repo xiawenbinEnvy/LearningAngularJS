@@ -1,0 +1,65 @@
+﻿@charset "utf-8";
+.mask{ width:740px; padding:0 0 30px; background:#fff; color:#333;}
+.mask .title{ height:42px; border-bottom:1px solid #ddd; background:#eee;}
+.mask .title h2{ line-height:42px; font-size:14px; color:#999; text-indent:12px;}
+.mask .title a{ float:right; display:block; margin:5px 5px 0 0; font-size:24px;}
+.mask .title a i{ font-size:24px; color:#aeb2b8;}
+.mask .title a:hover{ opacity:.9;}
+.mask_box{ position:relative; margin:0 20px 30px; padding:10px 0 20px;}
+.mask .btn{ text-align:center;}
+.mask .btn a{ display:inline-block; margin:0 10px 0 0;}
+
+.mask .tool{ float:left; width:220px; height:370px; border:1px solid #a4c7eb;}
+.mask .tool .tab{ height:35px; background:#dce8fa;}
+.mask .tool .tab a{ display:table-cell; width:109px; height:32px; border-top:2px solid #dce8fa; border-right:1px solid #a4c7eb; border-bottom:1px solid #a4c7eb; line-height:32px; font-weight:bold; color:#333; text-align:center;}
+.mask .tool .tab a.last{ width:110px; border-right:none;}
+.mask .tool .tab a.selected{ border-bottom-color:#fff; border-top-color:#2666bf; background:#fff; color:#2666bf;}
+.mask .tool .list{ padding:20px 0 0; color:#333;}
+.mask .tool .list dl{ margin:0 0 10px;}
+.mask .tool .list dt{ float:left; width:72px; margin:0 8px 0 0; line-height:26px; text-align:right;}
+.mask .tool .list dd{ float:left;}
+.mask .tool .list dd.text input{ width:88px; height:18px; padding:3px 5px; border:1px solid #ccc; line-height:18px;}
+.mask .tool .list dd.calendar{ position:relative;}
+.mask .tool .list dd.calendar span{ margin:0 0 0 4px; line-height:26px; color:#999;}
+.mask .tool .list dd.calendar i{ position:absolute; left:78px; top:6px; color:#add6ff; cursor:pointer;}
+.mask .tool .list dd.select select{ width:100px; height:26px; border:1px solid #ccc;}
+.mask .tool .list dd.file input.maskText{ float:left; width:59px; height:18px; padding:3px 5px; border:1px solid #ccc; border-right:none; line-height:18px;}
+.mask .tool .list dd.file a.maskBtn{ float:left; width:30px; height:26px; line-height:18px; background:#70a8e0; font-weight:bold; color:#fff; text-align:center; cursor:pointer;}
+.mask .tool .list dd.file a.otherBtn{ float:left; width:30px; height:26px; margin:0 0 0 5px; line-height:26px; background:#70a8e0; color:#fff; text-align:center;}
+.mask .tool .list dd.txt input{ margin:0 5px 0 0; vertical-align:-2px;}
+.mask .tool .list dd.btn i{ margin:0 8px 0 0; font-size:14px;}
+.mask_right.padd{ padding:0 0 0 232px;}
+
+.mask .subtitle h3{ padding:10px 0 0; border-bottom:1px solid #ccc; line-height:30px; font-size:14px; font-weight:normal; color:#666;}
+.mask .option{ padding:10px 0 0; color:#333;}
+.mask .option dl{ float:left; margin:0 18px 10px 0;}
+.mask .option dt{ float:left; margin:0 8px 0 0; line-height:28px;}
+.mask .option dt.checkbox{ margin:0 4px 0 0;}
+.mask .option dt.checkbox label{ cursor:pointer;}
+.mask .option dt.checkbox input{ margin:0 4px 0 0; vertical-align:-3px;}
+.mask .option dt.checkbox span{ line-height:28px;}
+.mask .option dd{ float:left;}
+.mask .option dd.text input{ width:90px; height:20px; padding:3px 5px; border:1px solid #ccc; line-height:20px;}
+.mask .option dd.calendar{ position:relative;}
+.mask .option dd.calendar i{ position:absolute; right:4px; top:6px; color:#add6ff; cursor:pointer;}
+.mask .option dd.select select{ width:100px; height:28px; border:1px solid #ccc;}
+.mask .option dd.txt{ line-height:28px;}
+.mask .option a{ float:left; margin:0 18px 10px 0;}
+.mask .option a i{ margin:0 8px 0 0; font-size:14px;}
+.mask .option a.long{ width:130px;}
+
+.mask.user{ width:240px; height:390px; padding:0;}
+.mask.user .user_search{ height:26px; padding:10px; border-bottom:1px solid #ddd;}
+.mask.user .user_search input{ float:left; width:169px; height:18px; padding:3px 5px; border:1px solid #ccc; border-right:none; line-height:18px;}
+.mask.user .user_search a{ float:left; width:40px; height:26px; line-height:26px;}
+.mask.user .user_search a i { margin: 0 4px 0 0; line-height:26px; font-size: 16px; }
+.mask.user .mask_box{ width:240px; height:251px; margin:0; padding:0; overflow:auto;}
+.mask.user .btn{ height:38px; padding:10px 0 0; border-top:1px solid #ddd; background:#f5f5f5;}
+.mask.user .btn span{ margin:0 10px 0 0; cursor:pointer; }
+.mask.user .btn a.checkbox { width:16px; height:14px; margin:0; padding:0; border-radius:0; background:#f5f5f5 url(../../mod/images/treeview/ntree_checkbox.png) no-repeat;cursor:pointer; vertical-align:-3px;}
+.mask.user .btn a.select { background-image:url(../../mod/images/treeview/ntree_checkbox_s.png) }
+
+.mask.image{ width:100%; height:100%;padding-top:20px;-webkit-transition: -webkit-transform 1s; }
+.mask.image .title{ border-bottom:none; background:none;}
+.mask.image .img{ text-align:center;position:relative;margin-left:20px;}
+.mask.image .img>img{-webkit-transition: -webkit-transform 1s;position:absolute;top:0;left:0;}

@@ -1,0 +1,23 @@
+<section class="crm">
+    <div class="content">
+        <div ng-controller="myController">
+            <div class="colorbox color2">
+                <div class="gridView">
+                    <my-grid-view grid-view-option="gridViewOption"
+                                  total-view-option="totalViewOption"
+                                  api-url="data.json"
+                                  initialize-request="initializeRequest"
+                                  selected-rows="gridViewSelectedRows"
+                                  page-num="2"
+                                  get-grid-data-property="getGridDataProperty"
+                                  get-page-data-property="getPageDataProperty"
+                                  get-sum-data-property="getSumDataProperty">
+                    </my-grid-view>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
